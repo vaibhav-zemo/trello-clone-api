@@ -6,7 +6,10 @@ const taskTransformer = {
             description: task.description,
             status: task.status,
             dueDate: task.dueDate,
-            assignedUser: task.assignedUser,
+            assignedUsers: task?.assignedUsers?.map(user => {
+                return user.name
+            }),
+            tags: task.tags
         }
     }
 }
@@ -14,7 +17,7 @@ const taskTransformer = {
 const taskListTransformer = {
     transform: (tasks) => {
         let response = {};
-        response.list = tasks.map(task => {
+        response.list = tasks?.map(task => {
             return taskTransformer.transform(task);
         });
         return response;

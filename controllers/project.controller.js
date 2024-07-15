@@ -1,11 +1,12 @@
 const Project = require('../models/project.model');
 const { isValidForCreate, isValidForUpdate } = require('../validators/project.validator');
 const { projectListTransformer, projectDetailedTransformer } = require('../transformers/project.transformer');
+const { populate } = require('../models/task.model');
 
 const create = async (req, res) => {
     try {
         const { error } = isValidForCreate.validate(req.body);
-        if (error) return res.status(400).send(error.message);
+        if (error) return res.status(400).send({ message: error.message });
 
         const { name, description } = req.body;
         const project = new Project({ name, description });
@@ -30,9 +31,14 @@ const list = async (req, res) => {
 
 const show = async (req, res) => {
     try {
-        const project = await Project.findById(req.params.id);
-        if (!project) return res.status(404).send('Project not found!');
-
+        const project = await Project.findById(req.params.id).populate({
+            path: 'tasks',
+            populate: { 
+                path: 'assignedUsers', 
+            }
+        });
+        if (!project) return res.status(404).send({ message: 'Project not found!' });
+        
         return res.status(200).send(projectDetailedTransformer.transform(project));
     }
     catch (err) {
@@ -43,14 +49,14 @@ const show = async (req, res) => {
 const update = async (req, res) => {
     try {
         const { error } = isValidForUpdate.validate(req.body);
-        if (error) return res.status(400).send(error.message);
+        if (error) return res.status(400).send({ message: error.message });
 
         const project = await Project.findByIdAndUpdate(
             req.params.id,
             { $set: req.body },
             { new: true }
         );
-        if (!project) return res.status(404).send('Project not found!');
+        if (!project) return res.status(404).send({ message: 'Project not found!' });
 
         return res.status(200).send({ message: 'Project updated successfully!' });
     }
@@ -62,7 +68,7 @@ const update = async (req, res) => {
 const remove = async (req, res) => {
     try {
         const project = await Project.findByIdAndDelete(req.params.id);
-        if (!project) return res.status(404).send('Project not found!');
+        if (!project) return res.status(404).send({ message: 'Project not found!' });
 
         return res.status(200).send({ message: 'Project deleted successfully!' });
     }
