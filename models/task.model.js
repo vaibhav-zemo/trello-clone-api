@@ -8,7 +8,8 @@ const taskSchema = new mongoose.Schema({
     assignedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     status: { type: String, enum: [BACKLOG, IN_DISCUSSION, IN_PROGRESS, DONE], default: BACKLOG },
     dueDate: { type: Date, require: true },
-    tags: [{ type: String }]
+    tags: [{ type: String }],
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);

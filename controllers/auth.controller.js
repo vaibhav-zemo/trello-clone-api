@@ -19,7 +19,7 @@ const register = async (req, res) => {
         return res.status(201).send({ message: 'User created successfully!' });
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({ message: err.message });
     }
 }
 
@@ -39,7 +39,7 @@ const login = async (req, res) => {
         return res.status(200).send({ user: { userId: user._id, name: user.name, email: user.email }, token });
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({ message: err.message });
     }
 }
 

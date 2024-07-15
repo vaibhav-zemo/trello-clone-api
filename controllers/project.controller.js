@@ -10,12 +10,13 @@ const create = async (req, res) => {
 
         const { name, description } = req.body;
         const project = new Project({ name, description });
+        project.createdBy = res.locals.user._id;
         await project.save();
 
         return res.status(201).send({ message: 'Project created successfully!' });
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({ message: err.message });
     }
 }
 
@@ -25,7 +26,7 @@ const list = async (req, res) => {
         return res.status(200).send(projectListTransformer.transform(projects));
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({ message: err.message });
     }
 }
 
@@ -42,7 +43,7 @@ const show = async (req, res) => {
         return res.status(200).send(projectDetailedTransformer.transform(project));
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({ message: err.message });
     }
 }
 
@@ -61,19 +62,24 @@ const update = async (req, res) => {
         return res.status(200).send({ message: 'Project updated successfully!' });
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({ message: err.message });
     }
 }
 
 const remove = async (req, res) => {
     try {
-        const project = await Project.findByIdAndDelete(req.params.id);
+        const project = await Project.findById(req.params.id);
         if (!project) return res.status(404).send({ message: 'Project not found!' });
 
+        if (project.createdBy.toString() !== res.locals.user._id.toString()) {
+            return res.status(403).send({ message: 'You are not authorized to delete this project!' });
+        }
+
+        await project.remove();
         return res.status(200).send({ message: 'Project deleted successfully!' });
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({ message: err.message });
     }
 }
 

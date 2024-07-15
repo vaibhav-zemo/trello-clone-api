@@ -1,3 +1,5 @@
+const dayjs = require('dayjs');
+
 const taskTransformer = {
     transform: (task) => {
         return {
@@ -5,7 +7,7 @@ const taskTransformer = {
             name: task.name,
             description: task.description,
             status: task.status,
-            dueDate: task.dueDate,
+            dueDate: dayjs(task.dueDate).format('DD/MM/YYYY'),
             assignedUsers: task?.assignedUsers?.map(user => {
                 return user.name
             }),

@@ -16,12 +16,12 @@ const create = async (req, res) => {
     try {
         const { error } = isValidForCreate.validate(req.body);
         if (error) {
-            return res.status(400).send({message: error.message});
+            return res.status(400).send({ message: error.message });
         }
 
         const { name, description, dueDate, tags, projectId, assignedUsers } = req.body;
 
-        for(let user of assignedUsers) {
+        for (let user of assignedUsers) {
             const userExists = await User.findById(user);
             if (!userExists) {
                 return res.status(404).send({ message: 'User not found!' });
@@ -35,11 +35,12 @@ const create = async (req, res) => {
 
         const currentDate = dayjs().tz('Asia/Kolkata');
         const dueDateFormatted = dayjs(dueDate, 'DD/MM/YYYY').tz('Asia/Kolkata');
-        if(dueDateFormatted.isBefore(currentDate)) {
+        if (dueDateFormatted.isBefore(currentDate)) {
             return res.status(400).send({ message: 'Due date cannot be in the past!' });
         }
 
         const task = new Task({ name, description, dueDate: dueDateFormatted, tags, project: projectId, assignedUsers });
+        task.createdBy = res.locals.user._id;
         await task.save();
 
         project.tasks.push(task._id);
@@ -48,7 +49,7 @@ const create = async (req, res) => {
         return res.status(201).send({ message: 'Task created successfully!' });
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({ message: err.message });
     }
 }
 
@@ -56,12 +57,12 @@ const update = async (req, res) => {
     try {
         const { error } = isValidForUpdate.validate(req.body);
         if (error) {
-            return res.status(400).send({message: error.message});
+            return res.status(400).send({ message: error.message });
         }
 
         const { name, description, tags, assignedUsers, status } = req.body;
 
-        if(assignedUsers) {
+        if (assignedUsers) {
             for (let user of assignedUsers) {
                 const userExists = await User.findById(user);
                 if (!userExists) {
@@ -83,15 +84,19 @@ const update = async (req, res) => {
         return res.status(200).send({ message: 'Task updated successfully!' });
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({ message: err.message });
     }
 }
 
 const remove = async (req, res) => {
     try {
-        const task = await Task.findByIdAndDelete(req.params.id);
+        const task = await Task.findById(req.params.id);
         if (!task) {
             return res.status(404).send({ message: 'Task not found!' });
+        }
+
+        if (task.createdBy.toString() !== res.locals.user._id.toString()) {
+            return res.status(403).send({ message: 'You are not authorized to delete this task!' });
         }
 
         const project = await Project.findById(task.project);
@@ -102,10 +107,11 @@ const remove = async (req, res) => {
         project.tasks.pull(task._id);
         await project.save();
 
+        await task.remove;
         return res.status(200).send({ message: 'Task deleted successfully!' });
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({ message: err.message });
     }
 }
 
@@ -119,7 +125,7 @@ const show = async (req, res) => {
         return res.status(200).send(taskTransformer.transform(task));
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({ message: err.message });
     }
 }
 
