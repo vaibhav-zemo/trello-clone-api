@@ -35,7 +35,7 @@ const show = async (req, res) => {
         const project = await Project.findById(req.params.id).populate({
             path: 'tasks',
             populate: { 
-                path: 'assignedUsers', 
+                path: 'assignedUser', 
             }
         });
         if (!project) return res.status(404).send({ message: 'Project not found!' });

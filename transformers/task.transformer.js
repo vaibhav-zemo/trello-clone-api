@@ -7,10 +7,11 @@ const taskTransformer = {
             name: task.name,
             description: task.description,
             status: task.status,
-            dueDate: dayjs(task.dueDate).format('DD/MM/YYYY'),
-            assignedUsers: task?.assignedUsers?.map(user => {
-                return user.name
-            }),
+            dueDate: dayjs(task.dueDate).format('MMM DD'),
+            assignedUser: {
+                name: task?.assignedUser?.name,
+                profileBg: task?.assignedUser?.profileBg
+            },
             tags: task.tags
         }
     }

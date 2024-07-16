@@ -19,13 +19,11 @@ const create = async (req, res) => {
             return res.status(400).send({ message: error.message });
         }
 
-        const { name, description, dueDate, tags, projectId, assignedUsers } = req.body;
+        const { name, description, dueDate, tags, projectId, assignedUser } = req.body;
 
-        for (let user of assignedUsers) {
-            const userExists = await User.findById(user);
-            if (!userExists) {
-                return res.status(404).send({ message: 'User not found!' });
-            }
+        const userExists = await User.findById(assignedUser);
+        if (!userExists) {
+            return res.status(404).send({ message: 'User not found!' });
         }
 
         const project = await Project.findById(projectId);
@@ -39,7 +37,7 @@ const create = async (req, res) => {
             return res.status(400).send({ message: 'Due date cannot be in the past!' });
         }
 
-        const task = new Task({ name, description, dueDate: dueDateFormatted, tags, project: projectId, assignedUsers });
+        const task = new Task({ name, description, dueDate: dueDateFormatted, tags, project: projectId, assignedUser });
         task.createdBy = res.locals.user._id;
         await task.save();
 
@@ -60,20 +58,18 @@ const update = async (req, res) => {
             return res.status(400).send({ message: error.message });
         }
 
-        const { name, description, tags, assignedUsers, status } = req.body;
+        const { name, description, tags, assignedUser, status } = req.body;
 
-        if (assignedUsers) {
-            for (let user of assignedUsers) {
-                const userExists = await User.findById(user);
-                if (!userExists) {
-                    return res.status(404).send({ message: 'User not found!' });
-                }
+        if (assignedUser) {
+            const userExists = await User.findById(assignedUser);
+            if (!userExists) {
+                return res.status(404).send({ message: 'User not found!' });
             }
         }
 
         const task = await Task.findByIdAndUpdate(
             req.params.id,
-            { name, description, tags, assignedUsers, status },
+            { name, description, tags, assignedUser, status },
             { new: true }
         );
 
@@ -117,7 +113,7 @@ const remove = async (req, res) => {
 
 const show = async (req, res) => {
     try {
-        const task = await Task.findById(req.params.id).populate('assignedUsers');
+        const task = await Task.findById(req.params.id).populate('assignedUser');
         if (!task) {
             return res.status(404).send({ message: 'Task not found!' });
         }

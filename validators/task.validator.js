@@ -6,7 +6,7 @@ const isValidForCreate = Joi.object({
     name: Joi.string().required(),
     description: Joi.string().required(),
     tags: Joi.array().items(Joi.string()),
-    assignedUsers: Joi.array().items(Joi.objectId()),
+    assignedUser: Joi.objectId().required(),
     projectId: Joi.objectId().required(),
     dueDate: Joi.date().format('DD/MM/YYYY').required()
 });
