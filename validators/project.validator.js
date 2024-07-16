@@ -8,7 +8,8 @@ const isValidForCreate = Joi.object({
 
 const isValidForUpdate = Joi.object({
     name: Joi.string(),
-    description: Joi.string()
+    description: Joi.string(),
+    bgColor: Joi.string()
 }).min(1);
 
 module.exports = { isValidForCreate, isValidForUpdate };

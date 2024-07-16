@@ -19,7 +19,7 @@ const create = async (req, res) => {
             return res.status(400).send({ message: error.message });
         }
 
-        const { name, description, dueDate, tags, projectId, assignedUser } = req.body;
+        const { name, description, dueDate, tags, projectId, assignedUser, status } = req.body;
 
         const userExists = await User.findById(assignedUser);
         if (!userExists) {
@@ -32,12 +32,12 @@ const create = async (req, res) => {
         }
 
         const currentDate = dayjs().tz('Asia/Kolkata');
-        const dueDateFormatted = dayjs(dueDate, 'DD/MM/YYYY').tz('Asia/Kolkata');
+        const dueDateFormatted = dayjs(dueDate, 'YYYY-MM-DD').tz('Asia/Kolkata');
         if (dueDateFormatted.isBefore(currentDate)) {
             return res.status(400).send({ message: 'Due date cannot be in the past!' });
         }
 
-        const task = new Task({ name, description, dueDate: dueDateFormatted, tags, project: projectId, assignedUser });
+        const task = new Task({ name, description, dueDate: dueDateFormatted, tags, project: projectId, assignedUser, status });
         task.createdBy = res.locals.user._id;
         await task.save();
 

@@ -8,7 +8,8 @@ const isValidForCreate = Joi.object({
     tags: Joi.array().items(Joi.string()),
     assignedUser: Joi.objectId().required(),
     projectId: Joi.objectId().required(),
-    dueDate: Joi.date().format('DD/MM/YYYY').required()
+    dueDate: Joi.date().format('YYYY-MM-DD').required(),
+    status: Joi.string().valid(BACKLOG, IN_DISCUSSION, IN_PROGRESS, DONE)
 });
 
 const isValidForUpdate = Joi.object({
