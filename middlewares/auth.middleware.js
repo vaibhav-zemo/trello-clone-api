@@ -8,7 +8,7 @@ const checkAuth = async (req, res, next) => {
 
         const token = header.split('Bearer ')[1];
         if (!token) return res.status(401).send('Auth token not found');
-
+        
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (!decoded) return res.status(401).send('Invalid token');
 

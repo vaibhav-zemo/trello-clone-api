@@ -8,8 +8,8 @@ const create = async (req, res) => {
         const { error } = isValidForCreate.validate(req.body);
         if (error) return res.status(400).send({ message: error.message });
 
-        const { name, description } = req.body;
-        const project = new Project({ name, description });
+        const { name, description, bgColor } = req.body;
+        const project = new Project({ name, description, bgColor });
         project.createdBy = res.locals.user._id;
         await project.save();
 

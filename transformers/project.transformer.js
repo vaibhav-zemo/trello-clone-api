@@ -6,6 +6,7 @@ const projectTransformer = {
             projectId: project._id,
             name: project.name,
             description: project.description,
+            bgColor: project.bgColor
         }
     }
 }

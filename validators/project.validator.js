@@ -2,7 +2,8 @@ const Joi = require('joi');
 
 const isValidForCreate = Joi.object({
     name: Joi.string().required(),
-    description: Joi.string().required()
+    description: Joi.string().required(),
+    bgColor: Joi.string()
 });
 
 const isValidForUpdate = Joi.object({

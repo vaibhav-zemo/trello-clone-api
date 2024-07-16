@@ -8,12 +8,12 @@ const register = async (req, res) => {
         const { error } = registerValidator.validate(req.body);
         if (error) return res.status(400).send({ message: error.message });
 
-        const { email, password, name } = req.body;
+        const { email, password, name, profileBg } = req.body;
         const user = await User.findOne({ email });
         if (user) return res.status(400).send({ message: 'User already exists!' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ email, password: hashedPassword, name });
+        const newUser = new User({ email, password: hashedPassword, name, profileBg });
         await newUser.save();
 
         return res.status(201).send({ message: 'User created successfully!' });
@@ -36,7 +36,7 @@ const login = async (req, res) => {
         if (!isMatch) return res.status(400).send({ message: 'Invalid password!' });
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
-        return res.status(200).send({ user: { userId: user._id, name: user.name, email: user.email }, token });
+        return res.status(200).send({ user: { userId: user._id, name: user.name, email: user.email, profileBg: user.profileBg }, token });
     }
     catch (err) {
         return res.status(500).send({ message: err.message });
