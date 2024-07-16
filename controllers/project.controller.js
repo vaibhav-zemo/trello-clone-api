@@ -22,7 +22,7 @@ const create = async (req, res) => {
 
 const list = async (req, res) => {
     try {
-        const projects = await Project.find();
+        const projects = await Project.find({ createdBy: res.locals.user._id });
         return res.status(200).send(projectListTransformer.transform(projects));
     }
     catch (err) {

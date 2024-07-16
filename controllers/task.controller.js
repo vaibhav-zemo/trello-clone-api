@@ -1,7 +1,7 @@
 const Task = require('../models/task.model');
 const User = require('../models/user.model');
 const Project = require('../models/project.model');
-const { taskTransformer } = require('../transformers/task.transformer');
+const { taskTransformer, taskListTransformer } = require('../transformers/task.transformer');
 const { isValidForCreate, isValidForUpdate } = require('../validators/task.validator');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -125,4 +125,14 @@ const show = async (req, res) => {
     }
 }
 
-module.exports = { create, update, remove, show };
+const list = async (req, res) => {
+    try {
+        const tasks = await Task.find({ createdBy: res.locals.user._id }).populate('assignedUser');
+        return res.status(200).send(taskListTransformer.transform(tasks));
+    }
+    catch (err) {
+        return res.status(500).send({ message: err.message });
+    }
+}
+
+module.exports = { create, update, remove, show, list };
